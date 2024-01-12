@@ -45,7 +45,7 @@ async function getIeti(req, res) {
   // - etc.
 
   res.writeHead(200, { 'Content-Type': 'text/html' })
-  res.end('<html><head><meta charset="UTF-8"></head><body><b>El millor</b> institut del món!</body></html>')
+  res.end('<html><head><meta charset="UTF-8"></head><body><b>El pitjor</b> institut del món!</body></html>')
 }
 
 // Configurar direcció tipus 'GET' amb la URL ‘/llistat’ i paràmetres URL 
