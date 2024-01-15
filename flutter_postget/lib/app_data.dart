@@ -16,6 +16,8 @@ class AppData with ChangeNotifier {
   bool loadingPost = false;
   bool loadingFile = false;
 
+  final List<String> messages = [];
+
   dynamic dataGet;
   dynamic dataPost;
   dynamic dataFile;

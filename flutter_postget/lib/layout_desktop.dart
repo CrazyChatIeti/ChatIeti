@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_desktop_kit/cdk.dart';
 import 'package:provider/provider.dart';
 
@@ -18,20 +19,10 @@ class LayoutDesktop extends StatefulWidget {
 }
 
 class _LayoutDesktopState extends State<LayoutDesktop> {
+  AppData appData = AppData();
   // Return a custom button
   Widget buildCustomButton(String buttonText, VoidCallback onPressedAction) {
-    return SizedBox(
-      width: 150, // Amplada total de l'espai
-      child: Align(
-        alignment: Alignment.centerRight, // Alineació a la dreta
-        child: CDKButton(
-          style: CDKButtonStyle.normal,
-          isLarge: false,
-          onPressed: onPressedAction,
-          child: Text(buttonText),
-        ),
-      ),
-    );
+    return Column(children: []);
   }
 
   // Funció per seleccionar un arxiu
