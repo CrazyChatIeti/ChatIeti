@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_desktop_kit/cdk.dart';
+import 'package:flutter_postget/layout_chat.dart';
 import 'package:provider/provider.dart';
 
 import 'app_data.dart';
@@ -75,67 +76,68 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text(widget.title),
+        middle: Text("Chat IETI"),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // Vertical
-        children: <Widget>[
-          Container(
-            height: 50,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              buildCustomButton('Crida tipus GET', () {
-                appData.load("GET");
-              }),
-              Container(
-                width: 10,
-              ),
-              Expanded(
-                  child: Text(stringGet,
-                      softWrap: true, overflow: TextOverflow.visible)),
-            ],
-          ),
-          Container(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              buildCustomButton('Crida tipus POST', () {
-                uploadFile(appData);
-              }),
-              Container(
-                width: 10,
-              ),
-              Expanded(
-                  child: Text(stringPost,
-                      softWrap: true, overflow: TextOverflow.visible)),
-            ],
-          ),
-          Container(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              buildCustomButton('Llegir arxiu .JSON', () {
-                appData.load("FILE");
-              }),
-              Container(
-                width: 10,
-              ),
-              Expanded(
-                  child: Text(stringFile,
-                      softWrap: true, overflow: TextOverflow.visible)),
-            ],
-          ),
-        ],
-      ),
+      // child: Column(
+      //   mainAxisAlignment: MainAxisAlignment.center, // Vertical
+      //   children: <Widget>[
+      //     Container(
+      //       height: 50,
+      //     ),
+      //     Row(
+      //       mainAxisAlignment: MainAxisAlignment.start,
+      //       crossAxisAlignment: CrossAxisAlignment.start,
+      //       children: <Widget>[
+      //         buildCustomButton('Crida tipus GET', () {
+      //           appData.load("GET");
+      //         }),
+      //         Container(
+      //           width: 10,
+      //         ),
+      //         Expanded(
+      //             child: Text(stringGet,
+      //                 softWrap: true, overflow: TextOverflow.visible)),
+      //       ],
+      //     ),
+      //     Container(
+      //       height: 20,
+      //     ),
+      //     Row(
+      //       mainAxisAlignment: MainAxisAlignment.start,
+      //       crossAxisAlignment: CrossAxisAlignment.start,
+      //       children: <Widget>[
+      //         buildCustomButton('Crida tipus POST', () {
+      //           uploadFile(appData);
+      //         }),
+      //         Container(
+      //           width: 10,
+      //         ),
+      //         Expanded(
+      //             child: Text(stringPost,
+      //                 softWrap: true, overflow: TextOverflow.visible)),
+      //       ],
+      //     ),
+      //     Container(
+      //       height: 20,
+      //     ),
+      //     Row(
+      //       mainAxisAlignment: MainAxisAlignment.start,
+      //       crossAxisAlignment: CrossAxisAlignment.start,
+      //       children: <Widget>[
+      //         buildCustomButton('Llegir arxiu .JSON', () {
+      //           appData.load("FILE");
+      //         }),
+      //         Container(
+      //           width: 10,
+      //         ),
+      //         Expanded(
+      //             child: Text(stringFile,
+      //                 softWrap: true, overflow: TextOverflow.visible)),
+      //       ],
+      //     ),
+      //   ],
+      // ),
+      child: LayoutChat(),
     );
   }
 }
