@@ -2,6 +2,7 @@ const express = require('express')
 const multer = require('multer');
 const url = require('url')
 
+const http = require('http');
 const app = express()
 const port = process.env.PORT || 3000
 
@@ -74,6 +75,7 @@ async function getLlistat(req, res) {
 // Configurar direcció tipus 'POST' amb la URL ‘/data'
 // Enlloc de fer una crida des d'un navegador, fer servir 'curl'
 // curl -X POST -F "data={\"type\":\"test\"}" -F "file=@package.json" http://localhost:3000/data
+// curl -X POST -F "data={\"type\":\"conversa\", \"prompt\":\"tell me one word\"}" http://localhost:3000/data
 app.post('/data', upload.single('file'), async (req, res) => {
   // Processar les dades del formulari i l'arxiu adjunt
   const textPost = req.body;
@@ -81,9 +83,9 @@ app.post('/data', upload.single('file'), async (req, res) => {
   let objPost = {}
 
   try {
-    objPost = JSON.parse(textPost.data)
+    objPost = JSON.parse(textPost.data);
   } catch (error) {
-    res.status(400).send('Sol·licitud incorrecta.')
+    res.status(400).send('Sol·licitud incorrecta.\n')
     console.log(error)
     return
   }
@@ -108,7 +110,52 @@ app.post('/data', upload.single('file'), async (req, res) => {
     res.write("POST Second line\n")
     await new Promise(resolve => setTimeout(resolve, 1000))
     res.end("POST Last line\n")
-  } else {
+  }
+  else if (objPost.type === 'conversa') {
+    callMistralApi(objPost.prompt, (chunk) => {
+      // Envía cada chunk de datos a medida que llega
+      if (chunk) {
+        let resp = JSON.parse(chunk)
+        console.log(resp.response);
+        res.write(resp.response);
+      }
+
+    });
+  }
+  else {
     res.status(400).send('Sol·licitud incorrecta.')
+  }
+
+  function callMistralApi(prompt, onDataCallback) {
+    const data = JSON.stringify({
+      model: 'mistral',
+      prompt: prompt
+    });
+
+    const options = {
+      hostname: 'localhost',
+      port: 11434,
+      path: '/api/generate',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length
+      }
+    };
+
+    const req = http.request(options, res => {
+      res.on('data', chunk => {
+        // Llamar al callback con cada fragmento de datos recibido
+        onDataCallback(chunk);
+      });
+    });
+
+    req.on('error', error => {
+      console.error('Error al llamar a la API de Mistral:', error);
+      // Manejar el error adecuadamente, tal vez con otro callback
+    });
+
+    req.write(data);
+    req.end();
   }
 })
