@@ -5,6 +5,7 @@ const url = require('url')
 const http = require('http');
 const app = express()
 const port = process.env.PORT || 3000
+let stop = false;
 
 // Configurar la rebuda d'arxius a través de POST
 const storage = multer.memoryStorage(); // Guardarà l'arxiu a la memòria
@@ -116,11 +117,18 @@ app.post('/data', upload.single('file'), async (req, res) => {
       // Envía cada chunk de datos a medida que llega
       if (chunk) {
         let resp = JSON.parse(chunk)
-        console.log(resp.response);
         res.write(resp.response);
+        if (resp.done || stop) {
+          stop = false;
+          res.end();
+        }
       }
 
     });
+  }
+  else if (objPost.type === 'stop') {
+    stop = true;
+    res.end();
   }
   else {
     res.status(400).send('Sol·licitud incorrecta.')
