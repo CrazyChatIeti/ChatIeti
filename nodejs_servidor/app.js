@@ -114,7 +114,6 @@ app.post('/data', upload.single('file'), async (req, res) => {
   }
   else if (objPost.type === 'conversa') {
     callMistralApi(objPost.prompt, (chunk) => {
-      // Envía cada chunk de datos a medida que llega
       if (chunk) {
         let resp = JSON.parse(chunk)
         res.write(resp.response);
@@ -123,7 +122,6 @@ app.post('/data', upload.single('file'), async (req, res) => {
           res.end();
         }
       }
-
     });
   }
   else if (objPost.type === 'stop') {
@@ -135,6 +133,39 @@ app.post('/data', upload.single('file'), async (req, res) => {
   }
 
   function callMistralApi(prompt, onDataCallback) {
+    const data = JSON.stringify({
+      model: 'mistral',
+      prompt: prompt
+    });
+
+    const options = {
+      hostname: 'localhost',
+      port: 11434,
+      path: '/api/generate',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length
+      }
+    };
+
+    const req = http.request(options, res => {
+      res.on('data', chunk => {
+        // Llamar al callback con cada fragmento de datos recibido
+        onDataCallback(chunk);
+      });
+    });
+
+    req.on('error', error => {
+      console.error('Error al llamar a la API de Mistral:', error);
+      // Manejar el error adecuadamente, tal vez con otro callback
+    });
+
+    req.write(data);
+    req.end();
+  }
+
+  function callLlavaApi(prompt, image, onDataCallback) {
     const data = JSON.stringify({
       model: 'mistral',
       prompt: prompt
