@@ -3,6 +3,7 @@ const multer = require('multer');
 const url = require('url')
 
 const http = require('http');
+const { log } = require('console');
 const app = express()
 const port = process.env.PORT || 3000
 let stop = false;
@@ -80,6 +81,7 @@ async function getLlistat(req, res) {
 app.post('/data', upload.single('file'), async (req, res) => {
   // Processar les dades del formulari i l'arxiu adjunt
   const textPost = req.body;
+  console.log(textPost);
   const uploadedFile = req.file;
   let objPost = {}
 
@@ -113,6 +115,7 @@ app.post('/data', upload.single('file'), async (req, res) => {
     res.end("POST Last line\n")
   }
   else if (objPost.type === 'conversa') {
+    console.log("hola guapo");
     callMistralApi(objPost.prompt, (chunk) => {
       if (chunk) {
         let resp = JSON.parse(chunk)

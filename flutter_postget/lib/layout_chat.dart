@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_desktop_kit/cdk.dart';
+import 'package:provider/provider.dart';
+import 'app_data.dart';
 import 'chatMessage.dart';
 
 class LayoutChat extends StatefulWidget {
@@ -8,45 +10,37 @@ class LayoutChat extends StatefulWidget {
   _LayoutChatState createState() => _LayoutChatState();
 }
 
-List<ChatMessage> messages = [
-  ChatMessage(
-      messageContent:
-          "Tengo cuatro casas que mostrarte y la verdad es que me estoy haciendo caca encima",
-      messageType: "receiver"),
-  ChatMessage(messageContent: "adios", messageType: "receiver"),
-  ChatMessage(messageContent: "que tal", messageType: "sender"),
-  ChatMessage(messageContent: "no tu", messageType: "sender"),
-  ChatMessage(messageContent: "tonto", messageType: "sender"),
-];
+TextEditingController _controller = TextEditingController();
 
 class _LayoutChatState extends State<LayoutChat> {
   @override
   Widget build(BuildContext context) {
+    AppData appData = Provider.of<AppData>(context);
+    String stringPost = "";
+    if (appData.loadingPost && appData.dataPost == "") {
+      stringPost = "Loading ...";
+    } else if (appData.dataPost != null) {
+      stringPost = appData.dataPost.toString();
+    }
     return CupertinoPageScaffold(
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 65, 74, 82),
         body: Stack(
           children: <Widget>[
-            ListView.builder(
-              itemCount: messages.length,
-              shrinkWrap: true,
-              padding: const EdgeInsets.only(top: 80),
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                return Container(
-                    alignment: Alignment.topCenter,
-                    padding: const EdgeInsets.only(
-                        left: 16, right: 16, top: 16, bottom: 10),
-                    child: Align(
-                        child: Container(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        messages[index].messageContent,
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                    )));
-              },
-            ),
+            Container(
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.only(
+                    left: 16, right: 16, top: 16, bottom: 10),
+                child: Align(
+                    child: Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    stringPost,
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                    style: const TextStyle(fontSize: 15),
+                  ),
+                ))),
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -58,8 +52,9 @@ class _LayoutChatState extends State<LayoutChat> {
                     const SizedBox(
                       width: 15,
                     ),
-                    const Expanded(
+                    Expanded(
                         child: CDKFieldText(
+                      controller: _controller,
                       textSize: 18,
                       isRounded: true,
                       placeholder: "Ask ChatIeti...",
@@ -68,7 +63,16 @@ class _LayoutChatState extends State<LayoutChat> {
                       width: 8,
                     ),
                     CDKButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          _controller.text != ""
+                              ? appData.messages.add(ChatMessage(
+                                  prompt: _controller.text, type: "conversa"))
+                              : null;
+                        });
+                        appData.load('POST', _controller.text);
+                        _controller.text = "";
+                      },
                       child: const Icon(
                         Icons.send,
                         color: Colors.white,

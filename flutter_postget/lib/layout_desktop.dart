@@ -38,17 +38,6 @@ class _LayoutDesktopState extends State<LayoutDesktop> {
     }
   }
 
-  // Funció per carregar l'arxiu seleccionat amb una sol·licitud POST
-  Future<void> uploadFile(AppData appData) async {
-    try {
-      appData.load("POST", selectedFile: await pickFile());
-    } catch (e) {
-      if (kDebugMode) {
-        print("Excepció (uploadFile): $e");
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     AppData appData = Provider.of<AppData>(context);
