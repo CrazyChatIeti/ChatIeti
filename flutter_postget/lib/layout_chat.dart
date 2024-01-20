@@ -5,6 +5,11 @@ import 'package:flutter_cupertino_desktop_kit/cdk.dart';
 import 'package:provider/provider.dart';
 import 'app_data.dart';
 import 'chatMessage.dart';
+import 'chatImgMessage.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
 
 class LayoutChat extends StatefulWidget {
   const LayoutChat({super.key});
@@ -93,6 +98,40 @@ class _LayoutChatState extends State<LayoutChat> {
                       },
                       child: const Icon(
                         Icons.send,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    CDKButton(
+                      onPressed: () async {
+                        FilePickerResult? result =
+                            await FilePicker.platform.pickFiles();
+
+                        if (result != null) {
+                          PlatformFile file = result.files.first;
+                          Uint8List? fileBytes = file.bytes;
+                          if (fileBytes != null) {
+                            String base64String = base64Encode(fileBytes);
+                            setState(() {
+                              if (_controller.text != "") {
+                                appData.messages.add(ChatImgMessage(
+                                  prompt: _controller.text,
+                                  type: "imatge",
+                                  image: base64String,
+                                ) as ChatMessage);
+                              }
+                            });
+                            // appData.load('POST', _controller.text,
+                            //     fileData: base64String);
+                            // _controller.text = "";
+                          }
+                        }
+                      },
+                      child: const Icon(
+                        Icons.attach_file,
                         color: Colors.white,
                         size: 24,
                       ),
