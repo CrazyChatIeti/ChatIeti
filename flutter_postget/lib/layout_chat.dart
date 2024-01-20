@@ -38,112 +38,124 @@ class _LayoutChatState extends State<LayoutChat> {
       });
     }
     return CupertinoPageScaffold(
-      child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 65, 74, 82),
-        body: Stack(
-          children: <Widget>[
-            ListView.builder(
-              controller: _scrollController,
-              itemCount: appData.messages.length,
-              itemBuilder: (context, index) {
-                return Center(
-                  child: Container(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      appData.messages[index].type == 'send'
-                          ? "You\n${appData.messages[index].messageContent}"
-                          : "Chat IETI\n${appData.messages[index].messageContent}",
-                      style: const TextStyle(fontSize: 15, color: Colors.white),
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
-                    ),
-                  ),
-                );
-              },
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
+        child: Scaffold(
+            backgroundColor: const Color.fromARGB(255, 65, 74, 82),
+            body: Center(
               child: Container(
-                padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
-                height: 80,
-                width: 700,
-                child: Row(
+                width: MediaQuery.of(context).size.width / 2,
+                height: MediaQuery.of(context).size.height,
+                child: Stack(
                   children: <Widget>[
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Expanded(
-                        child: CDKFieldText(
-                      controller: _controller,
-                      textSize: 18,
-                      isRounded: true,
-                      placeholder: "Ask ChatIeti...",
-                    )),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    CDKButton(
-                      onPressed: () {
-                        setState(() {
-                          _controller.text != ""
-                              ? appData.messages.add(ChatMessage(
-                                  messageContent: _controller.text,
-                                  type: "send"))
-                              : null;
-                        });
-                        appData.load('POST', _controller.text);
-                        appData.messages.add(
-                            ChatMessage(messageContent: "", type: "receive"));
-                        _controller.text = "";
-                      },
-                      child: const Icon(
-                        Icons.send,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    CDKButton(
-                      onPressed: () async {
-                        FilePickerResult? result =
-                            await FilePicker.platform.pickFiles();
+                    SizedBox(
+                        width: MediaQuery.of(context).size.width / 2,
+                        height: MediaQuery.of(context).size.height - 80,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: appData.messages.length,
+                          itemBuilder: (context, index) {
+                            return Center(
+                              child: Container(
+                                alignment: Alignment.centerLeft,
+                                padding:
+                                    const EdgeInsets.only(top: 10, bottom: 10),
+                                child: Text(
+                                  appData.messages[index].type == 'send'
+                                      ? "You\n${appData.messages[index].messageContent}"
+                                      : "Chat IETI\n${appData.messages[index].messageContent}",
+                                  style: const TextStyle(
+                                      fontSize: 15, color: Colors.white),
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
+                                ),
+                              ),
+                            );
+                          },
+                        )),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        padding: const EdgeInsets.only(
+                            left: 10, bottom: 10, top: 10),
+                        height: 80,
+                        width: 700,
+                        child: Row(
+                          children: <Widget>[
+                            const SizedBox(
+                              width: 15,
+                            ),
+                            Expanded(
+                                child: CDKFieldText(
+                              controller: _controller,
+                              textSize: 18,
+                              isRounded: true,
+                              placeholder: "Ask ChatIeti...",
+                            )),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            CDKButton(
+                              onPressed: () {
+                                setState(() {
+                                  _controller.text != ""
+                                      ? appData.messages.add(ChatMessage(
+                                          messageContent: _controller.text,
+                                          type: "send"))
+                                      : null;
+                                  appData.messages.add(ChatMessage(
+                                      messageContent: "", type: "receive"));
+                                });
+                                appData.load('POST', _controller.text);
+                                _controller.text = "";
+                              },
+                              child: const Icon(
+                                Icons.send,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            CDKButton(
+                              onPressed: () async {
+                                FilePickerResult? result =
+                                    await FilePicker.platform.pickFiles();
 
-                        if (result != null) {
-                          PlatformFile file = result.files.first;
-                          Uint8List? fileBytes = file.bytes;
-                          if (fileBytes != null) {
-                            String base64String = base64Encode(fileBytes);
-                            setState(() {
-                              if (_controller.text != "") {
-                                appData.messages.add(ChatImgMessage(
-                                  prompt: _controller.text,
-                                  type: "imatge",
-                                  image: base64String,
-                                ) as ChatMessage);
-                              }
-                            });
-                            // appData.load('POST', _controller.text,
-                            //     fileData: base64String);
-                            // _controller.text = "";
-                          }
-                        }
-                      },
-                      child: const Icon(
-                        Icons.attach_file,
-                        color: Colors.white,
-                        size: 24,
+                                if (result != null) {
+                                  PlatformFile file = result.files.first;
+                                  Uint8List? fileBytes = file.bytes;
+                                  if (fileBytes != null) {
+                                    String base64String =
+                                        base64Encode(fileBytes);
+                                    setState(() {
+                                      if (_controller.text != "") {
+                                        appData.messages.add(ChatImgMessage(
+                                          prompt: _controller.text,
+                                          type: "imatge",
+                                          image: base64String,
+                                        ) as ChatMessage);
+                                      }
+                                    });
+                                    // appData.load('POST', _controller.text,
+                                    //     fileData: base64String);
+                                    // _controller.text = "";
+                                  }
+                                }
+                              },
+                              child: const Icon(
+                                Icons.attach_file,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+            )));
   }
 
   void scrollToBottom() {
