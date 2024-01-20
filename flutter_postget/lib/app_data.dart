@@ -131,7 +131,6 @@ class AppData with ChangeNotifier {
         (data) {
           // Update dataPost with the latest data
           dataPost += data;
-          messages.add(ChatMessage(prompt: data, type: "response"));
           notifyListeners();
         },
         onDone: () {

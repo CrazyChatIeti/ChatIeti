@@ -1,18 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_cupertino_desktop_kit/cdk.dart';
 import 'package:provider/provider.dart';
 import 'app_data.dart';
 import 'chatMessage.dart';
 
 class LayoutChat extends StatefulWidget {
+  const LayoutChat({super.key});
+
   @override
   _LayoutChatState createState() => _LayoutChatState();
 }
 
 TextEditingController _controller = TextEditingController();
+ScrollController _scrollController = ScrollController();
 
 class _LayoutChatState extends State<LayoutChat> {
+  List<String> listPost = [];
   @override
   Widget build(BuildContext context) {
     AppData appData = Provider.of<AppData>(context);
@@ -21,26 +26,36 @@ class _LayoutChatState extends State<LayoutChat> {
       stringPost = "Loading ...";
     } else if (appData.dataPost != null) {
       stringPost = appData.dataPost.toString();
+      appData.messages[appData.messages.length - 1].messageContent = stringPost;
+
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        scrollToBottom();
+      });
     }
     return CupertinoPageScaffold(
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 65, 74, 82),
         body: Stack(
           children: <Widget>[
-            Container(
-                alignment: Alignment.topCenter,
-                padding: const EdgeInsets.only(
-                    left: 16, right: 16, top: 16, bottom: 10),
-                child: Align(
-                    child: Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    stringPost,
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                    style: const TextStyle(fontSize: 15),
+            ListView.builder(
+              controller: _scrollController,
+              itemCount: appData.messages.length,
+              itemBuilder: (context, index) {
+                return Center(
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      appData.messages[index].type == 'send'
+                          ? "You\n${appData.messages[index].messageContent}"
+                          : "Chat IETI\n${appData.messages[index].messageContent}",
+                      style: const TextStyle(fontSize: 15, color: Colors.white),
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
+                    ),
                   ),
-                ))),
+                );
+              },
+            ),
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -67,10 +82,13 @@ class _LayoutChatState extends State<LayoutChat> {
                         setState(() {
                           _controller.text != ""
                               ? appData.messages.add(ChatMessage(
-                                  prompt: _controller.text, type: "conversa"))
+                                  messageContent: _controller.text,
+                                  type: "send"))
                               : null;
                         });
                         appData.load('POST', _controller.text);
+                        appData.messages.add(
+                            ChatMessage(messageContent: "", type: "receive"));
                         _controller.text = "";
                       },
                       child: const Icon(
@@ -86,6 +104,14 @@ class _LayoutChatState extends State<LayoutChat> {
           ],
         ),
       ),
+    );
+  }
+
+  void scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.ease,
     );
   }
 }

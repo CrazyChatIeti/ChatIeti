@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
-
 class ChatMessage {
-  String prompt;
+  String messageContent;
   String type;
-  ChatMessage({required this.prompt, required this.type});
+  ChatMessage({required this.messageContent, required this.type});
 }
