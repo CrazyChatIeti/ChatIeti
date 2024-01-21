@@ -95,7 +95,9 @@ class AppData with ChangeNotifier {
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
     // Agregar datos JSON como parte del formulario
-    if (image == "") {
+    if (image == "" && text == "") {
+      request.fields['data'] = '{"type":"stop"}';
+    } else if (image == "") {
       request.fields['data'] = '{"type":"conversa", "prompt": "$text"}';
     } else {
       request.fields['data'] =
@@ -138,6 +140,7 @@ class AppData with ChangeNotifier {
         (data) {
           // Update dataPost with the latest data
           dataPost += data;
+          print(dataPost);
           notifyListeners();
         },
         onDone: () {

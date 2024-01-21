@@ -132,10 +132,12 @@ app.post('/data', upload.single('file'), async (req, res) => {
     callLlavaApi(prompt, objPost.image, (chunk) => {
       if (chunk) {
         let resp = JSON.parse(chunk)
-        res.write(resp.response);
+
         if (resp.done || stop) {
           stop = false;
           res.end();
+        } else {
+          res.write(resp.response);
         }
       }
     });

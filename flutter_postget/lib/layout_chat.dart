@@ -5,7 +5,6 @@ import 'package:flutter_cupertino_desktop_kit/cdk.dart';
 import 'package:provider/provider.dart';
 import 'app_data.dart';
 import 'chatMessage.dart';
-import 'chatImgMessage.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -60,23 +59,45 @@ class _LayoutChatState extends State<LayoutChat> {
                                 padding:
                                     const EdgeInsets.only(top: 10, bottom: 10),
                                 child: Column(children: [
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      appData.messages[index].type == 'send'
+                                          ? "You"
+                                          : "Chat IETI",
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
                                   appData.messages[index].image != ""
                                       ? Image.memory(
                                           base64Decode(appData
                                               .messages[index].image
                                               .split(',')
                                               .last),
-                                          width: 750,
-                                          height: 750,
+                                          width: 400,
+                                          height: 400,
                                           fit: BoxFit.cover,
                                         )
                                       : SizedBox(),
+                                  SizedBox(
+                                    height: 8,
+                                  ),
                                   Container(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
                                       appData.messages[index].type == 'send'
-                                          ? "You\n${appData.messages[index].messageContent}"
-                                          : "Chat IETI\n${appData.messages[index].messageContent}",
+                                          ? "${appData.messages[index].messageContent}"
+                                          : appData.loadingPost &&
+                                                  appData.messages[index - 1]
+                                                          .image !=
+                                                      "" &&
+                                                  !appData
+                                                      .messages[index].oldMssg
+                                              ? "Loading ..."
+                                              : "${appData.messages[index].messageContent}",
                                       style: const TextStyle(
                                           fontSize: 15, color: Colors.white),
                                       softWrap: true,
@@ -112,26 +133,39 @@ class _LayoutChatState extends State<LayoutChat> {
                             ),
                             CDKButton(
                               onPressed: () {
-                                setState(() {
-                                  _controller.text != "" ||
-                                          appData.tempImg != ""
-                                      ? appData.messages.add(ChatMessage(
-                                          messageContent: _controller.text,
-                                          type: "send",
-                                          image: appData.tempImg))
-                                      : null;
-                                  appData.messages.add(ChatMessage(
-                                      messageContent: "",
-                                      type: "receive",
-                                      image: ""));
-                                });
-                                appData.load(
-                                    'POST', _controller.text, appData.tempImg);
-                                _controller.text = "";
-                                appData.tempImg = "";
+                                if (!appData.loadingPost) {
+                                  setState(() {
+                                    _controller.text != "" ||
+                                            appData.tempImg != ""
+                                        ? appData.messages.add(ChatMessage(
+                                            messageContent: _controller.text,
+                                            type: "send",
+                                            image: appData.tempImg,
+                                            oldMssg: true))
+                                        : null;
+                                    appData.messages.add(ChatMessage(
+                                        messageContent: "",
+                                        type: "receive",
+                                        image: "",
+                                        oldMssg: false));
+                                    if (appData.messages.length > 2) {
+                                      appData
+                                          .messages[appData.messages.length - 3]
+                                          .oldMssg = true;
+                                    }
+                                  });
+                                  appData.load('POST', _controller.text,
+                                      appData.tempImg);
+                                  _controller.text = "";
+                                  appData.tempImg = "";
+                                } else {
+                                  appData.load('POST', "", "");
+                                }
                               },
-                              child: const Icon(
-                                Icons.send,
+                              child: Icon(
+                                appData.loadingPost
+                                    ? Icons.stop_circle_outlined
+                                    : Icons.send,
                                 color: Colors.white,
                                 size: 24,
                               ),
