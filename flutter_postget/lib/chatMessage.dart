@@ -1,5 +1,7 @@
 class ChatMessage {
   String messageContent;
   String type;
-  ChatMessage({required this.messageContent, required this.type});
+  String image;
+  ChatMessage(
+      {required this.messageContent, required this.type, required this.image});
 }

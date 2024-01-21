@@ -37,6 +37,7 @@ class _LayoutChatState extends State<LayoutChat> {
         scrollToBottom();
       });
     }
+
     return CupertinoPageScaffold(
         child: Scaffold(
             backgroundColor: const Color.fromARGB(255, 65, 74, 82),
@@ -58,15 +59,31 @@ class _LayoutChatState extends State<LayoutChat> {
                                 alignment: Alignment.centerLeft,
                                 padding:
                                     const EdgeInsets.only(top: 10, bottom: 10),
-                                child: Text(
-                                  appData.messages[index].type == 'send'
-                                      ? "You\n${appData.messages[index].messageContent}"
-                                      : "Chat IETI\n${appData.messages[index].messageContent}",
-                                  style: const TextStyle(
-                                      fontSize: 15, color: Colors.white),
-                                  softWrap: true,
-                                  overflow: TextOverflow.visible,
-                                ),
+                                child: Column(children: [
+                                  appData.messages[index].image != ""
+                                      ? Image.memory(
+                                          base64Decode(appData
+                                              .messages[index].image
+                                              .split(',')
+                                              .last),
+                                          width: 750,
+                                          height: 750,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : SizedBox(),
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      appData.messages[index].type == 'send'
+                                          ? "You\n${appData.messages[index].messageContent}"
+                                          : "Chat IETI\n${appData.messages[index].messageContent}",
+                                      style: const TextStyle(
+                                          fontSize: 15, color: Colors.white),
+                                      softWrap: true,
+                                      overflow: TextOverflow.visible,
+                                    ),
+                                  ),
+                                ]),
                               ),
                             );
                           },
@@ -99,13 +116,17 @@ class _LayoutChatState extends State<LayoutChat> {
                                   _controller.text != ""
                                       ? appData.messages.add(ChatMessage(
                                           messageContent: _controller.text,
-                                          type: "send"))
+                                          type: "send",
+                                          image: appData.tempImg))
                                       : null;
                                   appData.messages.add(ChatMessage(
-                                      messageContent: "", type: "receive"));
+                                      messageContent: "",
+                                      type: "receive",
+                                      image: ""));
                                 });
                                 appData.load('POST', _controller.text);
                                 _controller.text = "";
+                                appData.tempImg = "";
                               },
                               child: const Icon(
                                 Icons.send,
@@ -119,7 +140,10 @@ class _LayoutChatState extends State<LayoutChat> {
                             CDKButton(
                               onPressed: () async {
                                 FilePickerResult? result =
-                                    await FilePicker.platform.pickFiles();
+                                    await FilePicker.platform.pickFiles(
+                                        type: FileType.custom,
+                                        allowedExtensions: ['png'],
+                                        withData: true);
 
                                 if (result != null) {
                                   PlatformFile file = result.files.first;
@@ -128,13 +152,14 @@ class _LayoutChatState extends State<LayoutChat> {
                                     String base64String =
                                         base64Encode(fileBytes);
                                     setState(() {
-                                      if (_controller.text != "") {
-                                        appData.messages.add(ChatImgMessage(
-                                          prompt: _controller.text,
-                                          type: "imatge",
-                                          image: base64String,
-                                        ) as ChatMessage);
-                                      }
+                                      appData.tempImg = base64String;
+                                      // if (_controller.text != "") {
+                                      //   appData.messages.add(ChatMessage(
+                                      //     messageContent: _controller.text,
+                                      //     type: "imatge",
+                                      //     image: base64String,
+                                      //   ));
+                                      // }
                                     });
                                     // appData.load('POST', _controller.text,
                                     //     fileData: base64String);
@@ -148,6 +173,31 @@ class _LayoutChatState extends State<LayoutChat> {
                                 size: 24,
                               ),
                             ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            appData.tempImg != ""
+                                ? Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(9),
+                                    ),
+                                    child: Center(
+                                        child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                          8.0), // Aquí ajustas el radio del borde
+                                      child: Image.memory(
+                                        base64Decode(
+                                            appData.tempImg.split(',').last),
+                                        width: 35,
+                                        height: 35,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )),
+                                  )
+                                : Container()
                           ],
                         ),
                       ),

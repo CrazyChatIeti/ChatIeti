@@ -21,6 +21,7 @@ class AppData with ChangeNotifier {
   dynamic dataPost;
   dynamic dataFile;
 
+  String tempImg = "";
   List<ChatMessage> messages = [];
 
   // Funció per fer crides tipus 'GET' i agafar la informació a mida que es va rebent
