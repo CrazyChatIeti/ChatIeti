@@ -113,7 +113,8 @@ class _LayoutChatState extends State<LayoutChat> {
                             CDKButton(
                               onPressed: () {
                                 setState(() {
-                                  _controller.text != ""
+                                  _controller.text != "" ||
+                                          appData.tempImg != ""
                                       ? appData.messages.add(ChatMessage(
                                           messageContent: _controller.text,
                                           type: "send",
@@ -124,7 +125,8 @@ class _LayoutChatState extends State<LayoutChat> {
                                       type: "receive",
                                       image: ""));
                                 });
-                                appData.load('POST', _controller.text);
+                                appData.load(
+                                    'POST', _controller.text, appData.tempImg);
                                 _controller.text = "";
                                 appData.tempImg = "";
                               },
@@ -142,7 +144,7 @@ class _LayoutChatState extends State<LayoutChat> {
                                 FilePickerResult? result =
                                     await FilePicker.platform.pickFiles(
                                         type: FileType.custom,
-                                        allowedExtensions: ['png'],
+                                        allowedExtensions: ['png', 'jpg'],
                                         withData: true);
 
                                 if (result != null) {
@@ -153,13 +155,6 @@ class _LayoutChatState extends State<LayoutChat> {
                                         base64Encode(fileBytes);
                                     setState(() {
                                       appData.tempImg = base64String;
-                                      // if (_controller.text != "") {
-                                      //   appData.messages.add(ChatMessage(
-                                      //     messageContent: _controller.text,
-                                      //     type: "imatge",
-                                      //     image: base64String,
-                                      //   ));
-                                      // }
                                     });
                                     // appData.load('POST', _controller.text,
                                     //     fileData: base64String);

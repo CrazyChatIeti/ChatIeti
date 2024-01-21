@@ -89,12 +89,18 @@ class AppData with ChangeNotifier {
   //   }
   // }
 
-  Future<void> loadHttpPostByChunks(String url, String text) async {
+  Future<void> loadHttpPostByChunks(
+      String url, String text, String image) async {
     var completer = Completer<void>();
     var request = http.MultipartRequest('POST', Uri.parse(url));
 
     // Agregar datos JSON como parte del formulario
-    request.fields['data'] = '{"type":"conversa", "prompt": "$text"}';
+    if (image == "") {
+      request.fields['data'] = '{"type":"conversa", "prompt": "$text"}';
+    } else {
+      request.fields['data'] =
+          '{"type":"imatge", "prompt": "$text", "image": "$image"}';
+    }
 
     // // Convertir el string a bytes y crear un stream de bytes
     // List<int> textBytes = utf8.encode(text);
@@ -166,7 +172,7 @@ class AppData with ChangeNotifier {
   }
 
   // Carregar dades segons el tipus que es demana
-  void load(String type, String selectedString) async {
+  void load(String type, String selectedString, String image) async {
     switch (type) {
       case 'GET':
         loadingGet = true;
@@ -194,7 +200,7 @@ class AppData with ChangeNotifier {
         loadingPost = true;
         notifyListeners();
         await loadHttpPostByChunks(
-            'http://localhost:3000/data', selectedString);
+            'http://localhost:3000/data', selectedString, image);
         loadingPost = false;
         notifyListeners();
         break;
