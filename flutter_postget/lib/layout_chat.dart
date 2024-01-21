@@ -181,7 +181,7 @@ class _LayoutChatState extends State<LayoutChat> {
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: Color.fromARGB(255, 245, 245, 220),
                                       borderRadius: BorderRadius.circular(9),
                                     ),
                                     child: Center(
