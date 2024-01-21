@@ -97,6 +97,7 @@ class AppData with ChangeNotifier {
     // Agregar datos JSON como parte del formulario
     if (image == "" && text == "") {
       request.fields['data'] = '{"type":"stop"}';
+      loadingPost = false;
     } else if (image == "") {
       request.fields['data'] = '{"type":"conversa", "prompt": "$text"}';
     } else {
@@ -132,18 +133,26 @@ class AppData with ChangeNotifier {
     // }
     try {
       var response = await request.send();
+      print("inicio try");
 
-      dataPost = "";
+      if (loadingPost) dataPost = "";
 
       // Listen to each chunk of data
       response.stream.transform(utf8.decoder).listen(
         (data) {
-          // Update dataPost with the latest data
-          dataPost += data;
-          print(dataPost);
-          notifyListeners();
+          if (loadingPost) {
+            print("inicio data");
+            print(dataPost);
+            // Update dataPost with the latest data
+            dataPost += data;
+            print("Despues data");
+            print(dataPost);
+            notifyListeners();
+          }
         },
         onDone: () {
+          print("onDone");
+          loadingPost = false;
           completer.complete();
         },
         onError: (error) {
